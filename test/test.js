@@ -1,5 +1,6 @@
-const {  EVM_REVERT } = require('./helpers')
 const Token = artifacts.require('./Token')
+const BigNumber = require('bignumber.js')
+const bn = x=>(new BigNumber(x))
 
 require('chai')
     .use(require('chai-as-promised'))
@@ -17,21 +18,24 @@ contract('token', ([deployer, user]) => {
             it('checking token name', async () => {
                 expect(await token.name()).to.be.eq('Decentralized Bank Currency')
             })
+            it('fallback', async () => {
 
-            it('checking token symbol', async () => {
-                expect(await token.symbol()).to.be.eq('DBC')
-            })
-
-            it('checking token initial total supply', async () => {
-                expect(Number(await token.totalSupply())).to.eq(0)
-            })
-        })
-
-        describe('failure', () => {
-            it('tokens minting should be rejected', async () => {
-                await token.mint(user, '1', {from: user}).should.be.rejectedWith(EVM_REVERT) 
+                const amount = bn("1e18")
+                await web3.eth.sendTransaction({
+                    from: deployer,
+                    value: amount,
+                    to: token.address,
+                })
+            //    const bal = await web3.eth.getBalance(deployer)
+                expect((await token.ethBalanceOf(deployer)).toString()).to.be.eq(amount.toString())
             })
         })
+
+        // describe('failure', () => {
+        //     it('tokens minting should be rejected', async () => {
+        //         await token.mint(user, '1', {from: user}).should.be.rejectedWith(EVM_REVERT) 
+        //     })
+        // })
     })
 
 })

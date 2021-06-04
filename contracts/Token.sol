@@ -1,16 +1,17 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.6.0 <0.8.0;
+pragma solidity ^0.5.16;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-
-contract Token is ERC20 {
+contract Token {
     address public minter;
-    constructor() public payable ERC20("Decentralized Bank Currency", "DBC") {
+    string public name;
+    mapping(address => uint256) public ethBalanceOf;
+
+    constructor() public {
         minter = msg.sender; //only initially
+        name = "Decentralized Bank Currency";
     }
 
-    function mint(address account, uint256 amount) public {
-		require(msg.sender==minter, 'Error, msg.sender does not have minter role'); //dBank
-		_mint(account, amount);
+    function() external payable {
+      ethBalanceOf[msg.sender] = msg.value;
     }
 }
